@@ -1,0 +1,95 @@
+package selenium;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class CalendarTest {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        driver.get("https://seleniumpractise.blogspot.com/2016/08/how-to-handle-calendar-in-selenium.html");
+
+        // Target date - can be past or future
+        LocalDate targetDate = LocalDate.of(2023, 7, 17);
+
+        // Open calendar
+        driver.findElement(By.id("datepicker")).click();
+
+        // Wait for calendar
+        By calendarTitle = By.xpath("//div[@class='ui-datepicker-title']");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(calendarTitle));
+
+        // Target month and year
+        int targetMonth = targetDate.getMonthValue();
+        int targetYear = targetDate.getYear();
+
+        while (true) {
+
+            // Get currently displayed month and year
+            String monthYearValue = driver.findElement(calendarTitle).getText();
+
+            System.out.println("Displayed: " + monthYearValue);
+
+            String[] monthYear = monthYearValue.split(" ");
+
+            String currentMonthName = monthYear[0];
+            int currentYear = Integer.parseInt(monthYear[1]);
+
+            int currentMonth = LocalDate
+                    .parse("01 " + currentMonthName + " " + currentYear,
+                            DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+                    .getMonthValue();
+
+            // Check if target month/year is displayed
+            if (currentMonth == targetMonth && currentYear == targetYear) {
+                break;
+            }
+
+            // Move forward
+            if (currentYear < targetYear ||
+                    (currentYear == targetYear && currentMonth < targetMonth)) {
+
+                driver.findElement(
+                        By.xpath("//a[@data-handler='next' and @data-event='click']")
+                ).click();
+
+            }
+            // Move backward
+            else {
+
+                driver.findElement(
+                        By.xpath("//a[@data-handler='prev' and @data-event='click']")
+                ).click();
+            }
+
+            // Wait for calendar title to update
+            wait.until(ExpectedConditions.visibilityOfElementLocated(calendarTitle));
+        }
+
+        // Select target day
+        String day = String.valueOf(targetDate.getDayOfMonth());
+
+        By dayLocator = By.xpath(
+                "//a[contains(@class,'ui-state-default') and normalize-space(text())='" + day + "']"
+        );
+
+        wait.until(ExpectedConditions.elementToBeClickable(dayLocator)).click();
+
+        System.out.println("Selected date: " + targetDate);
+
+//        driver.quit();
+    }
+}
