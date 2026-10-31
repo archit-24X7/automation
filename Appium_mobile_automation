@@ -1,0 +1,390 @@
+-> Appium inspector setup
+
+{
+  "platformName": "android",
+  "appium:deviceName": "emulator-5554",
+  "appium:udid": "emulator-5554",
+  "appium:automationName": "UiAutomator2",
+  "appium:appPackage": "com.myzamtel.staging",
+  "appium:appActivity": "com.myzamtel.staging.MainActivity"
+  "appium:noReset": true,
+  "appium:newCommandTimeout": 3600
+}
+
+-> appium automation script
+
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.options.BaseOptions;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+
+import java.awt.*;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.io.IOException;
+import java.sql.*;
+import java.time.Duration;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class AppiumTest {
+    private static final Duration APPIUM_STARTUP_TIMEOUT = Duration.ofSeconds(30);
+    private static Process appiumProcess;
+
+    private AndroidDriver driver;
+
+    private final Capabilities options = new BaseOptions()
+            .amend("platformName", "Android")
+            .amend("appium:deviceName", "emulator-5554")
+            .amend("appium:udid", "emulator-5554")
+            .amend("appium:automationName", "UiAutomator2")
+            .amend("appium:appPackage", "com.myzamtel.staging")
+            .amend("appium:appActivity", "com.myzamtel.feature.MainActivity")
+            .amend("appium:noReset", false)
+            .amend("appium:newCommandTimeout", 3600)
+            .amend("appium:ensureWebviewsHavePages", true)
+            .amend("appium:nativeWebScreenshot", true)
+            .amend("appium:connectHardwareKeyboard", true);
+
+    @Test
+    public void sampleTest() throws InterruptedException, SQLException {
+        System.out.println("Testing started");
+        String currentActivity = driver.currentActivity();
+        System.out.println("Current Activity "+ currentActivity);
+        Thread.sleep(1000);
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"onboarding_header_nav_right_icon\"]")).click();
+        List<WebElement> permissionButtons = driver.findElements(
+                AppiumBy.id("com.android.permissioncontroller:id/permission_allow_button"));
+        if (permissionButtons.isEmpty()) {
+            System.out.println("No Android permission prompt appeared");
+        } else {
+            permissionButtons.get(0).click();
+        }
+
+//        driver.findElement(AppiumBy.xpath("//android.widget.EditText[@resource-id=\"login_phone_input_field\"]/android.view.View[3]")).click();
+//        driver.findElement(AppiumBy.xpath(
+//                "//android.widget.TextView[@resource-id=\"login_country_code_text\"]"))
+//                .sendKeys("956184031");
+
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+                driver.findElement(AppiumBy.xpath(
+                "//android.widget.EditText[@resource-id=\"login_phone_input_field\"]"))
+                .sendKeys("956184031");
+
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@content-desc=\"checkbox\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.Button")).click();
+
+//        driver.findElement(AppiumBy.xpath("//android.widget.Button")).click();
+
+
+
+        String otp = getOTPFromDatabase("956184031");
+
+        System.out.println(otp);
+
+        driver.findElement(AppiumBy.xpath("//android.widget.EditText[@resource-id=\"otp_hidden_text_field\"]")).sendKeys(otp);
+
+//        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"home_module_quick_links_service_305_item\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.Button")).click();
+
+        Thread.sleep(5000);
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"home_module_quick_links_service_305_item\"]")).click();
+
+        Thread.sleep((5000));
+
+
+
+        driver.findElement(AppiumBy.xpath("//android.widget.Button")).click();
+
+        String OTP = getOTPFromDatabase("956184031");
+
+        System.out.println(OTP);
+
+        driver.findElement(AppiumBy.xpath("//android.widget.EditText[@resource-id=\"mobile_money_otp_hidden_text_field\"]")).sendKeys(OTP);
+
+        driver.findElement(AppiumBy.xpath("//android.widget.Button")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"1\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"2\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"1\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@text=\"2\"]")).click();
+
+//        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"mobile_money_otp_pin_pin_digit_0_box\"]")).sendKeys("1212");
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@content-desc=\"submit\"]")).click();
+
+        Thread.sleep(5000);
+
+        driver.findElement(AppiumBy.xpath("//android.widget.Button[@resource-id=\"com.android.permissioncontroller:id/permission_allow_button\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"send_money_contact_view_recent_transactions_row_0_item_0_box\"]/android.view.View/android.widget.TextView[@text=\"Tom Phiri\"]")).click();
+
+        driver.findElement(AppiumBy.xpath(
+                "//*[@resource-id='send_money_amount_entry_view_amount_input_field']"))
+                .sendKeys("100");
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@resource-id=\"common_button_button_text\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@resource-id=\"send_money_summary_screen_button_text\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.widget.TextView[@resource-id=\"switch_wallet_bottom_sheet_pay_button_text\"]")).click();
+
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"number_1\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"number_2\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"number_1\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"number_2\"]")).click();
+
+        driver.findElement(AppiumBy.xpath("//android.view.View[@content-desc=\"submit\"]")).click();
+
+        WebElement txn = driver.findElement(AppiumBy.xpath("//android.widget.TextView[@resource-id=\"transaction_receipt_payment_details_transaction_id_value_text\"]"));
+        String transactionId = txn.getText();
+//        int a = Integer.parseInt(transactionId);
+        System.out.println(transactionId);
+
+
+
+
+    }
+
+    @Test
+    public void skipB() {
+//        driver.findElement(AppiumBy.id("onboarding_next_arrow_icon")).click();
+        driver.findElement(AppiumBy.xpath("//android.view.View[@resource-id=\"onboarding_header_nav_right_icon\"]")).click();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("skip Clicked");
+    }
+
+    @Test
+    public void mnf()
+    {
+        WebElement mnfcl = driver.findElement(AppiumBy.xpath("//div[contains(@class, '_highlighterBox_24sep_1') and contains(@class, '_inspectedElementBox_24sep_7')]"));
+        mnfcl.click();
+    }
+
+    @Before
+    public void setUp() throws MalformedURLException {
+        URL serverUrl = getUrl();
+        ensureAppiumServer(serverUrl);
+        try {
+            driver = new AndroidDriver(serverUrl, options);
+        } catch (WebDriverException exception) {
+            if (isConnectionRefused(exception)) {
+                throw new IllegalStateException(
+                        "Cannot connect to the Appium server at " + serverUrl
+                                + ". Start Appium with `appium --address 127.0.0.1 --port 4723`, "
+                                + "confirm an Android device is available with `adb devices`, "
+                                + "or configure APPIUM_SERVER_URL / -Dappium.server.url.",
+                        exception);
+            }
+            throw exception;
+        }
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+    }
+
+    @After
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
+        }
+    }
+
+    @AfterClass
+    public static void stopStartedAppiumServer() {
+        if (appiumProcess != null && appiumProcess.isAlive()) {
+            appiumProcess.destroy();
+            try {
+                if (!appiumProcess.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    appiumProcess.destroyForcibly();
+                }
+            } catch (InterruptedException exception) {
+                appiumProcess.destroyForcibly();
+                Thread.currentThread().interrupt();
+            }
+        }
+        appiumProcess = null;
+    }
+
+    private void ensureAppiumServer(URL serverUrl) {
+        if (isServerReady(serverUrl)) {
+            return;
+        }
+
+        URI uri = URI.create(serverUrl.toString());
+        if (!"http".equalsIgnoreCase(uri.getScheme()) || !isLoopback(uri.getHost())) {
+            throw new IllegalStateException("Appium server is not reachable at " + serverUrl
+                    + ". Automatic startup is supported only for a local HTTP server.");
+        }
+
+        String command = System.getProperty("appium.command");
+        if (command == null || command.isBlank()) {
+            command = System.getenv("APPIUM_COMMAND");
+        }
+        if (command == null || command.isBlank()) {
+            command = "appium";
+        }
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command, "--address", uri.getHost(),
+                    "--port", Integer.toString(uri.getPort() < 0 ? 4723 : uri.getPort()));
+            String basePath = uri.getPath();
+            if (basePath != null && !basePath.isBlank() && !"/".equals(basePath)) {
+                processBuilder.command().add("--base-path");
+                processBuilder.command().add(basePath);
+            }
+            appiumProcess = processBuilder.inheritIO().start();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not start Appium automatically. Install Appium and make the `appium` "
+                    + "command available, or set APPIUM_COMMAND / -Dappium.command to its executable path.", exception);
+        }
+
+        long deadline = System.nanoTime() + APPIUM_STARTUP_TIMEOUT.toNanos();
+        while (System.nanoTime() < deadline) {
+            if (isServerReady(serverUrl)) {
+                return;
+            }
+            if (!appiumProcess.isAlive()) {
+                throw new IllegalStateException("Appium exited before becoming ready. Check the Appium output above.");
+            }
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while waiting for the Appium server to start.", exception);
+            }
+        }
+        throw new IllegalStateException("Appium did not become ready at " + serverUrl + " within "
+                + APPIUM_STARTUP_TIMEOUT.toSeconds() + " seconds. Check the Appium output above.");
+    }
+
+    private boolean isServerReady(URL serverUrl) {
+        URI uri = URI.create(serverUrl.toString());
+        String path = uri.getPath();
+        String statusPath = (path == null || path.isBlank() || "/".equals(path)
+                ? "" : path.replaceAll("/+$", "")) + "/status";
+        URI statusUri = URI.create(uri.getScheme() + "://" + uri.getRawAuthority() + statusPath);
+        try {
+            HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(1)).build();
+            HttpRequest request = HttpRequest.newBuilder(statusUri)
+                    .timeout(Duration.ofSeconds(1))
+                    .GET()
+                    .build();
+            HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+            return response.statusCode() >= 200 && response.statusCode() < 300;
+        } catch (IOException exception) {
+            return false;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while checking the Appium server.", exception);
+        }
+    }
+
+    private boolean isLoopback(String host) {
+        try {
+            return InetAddress.getByName(host).isLoopbackAddress();
+        } catch (IOException exception) {
+            return false;
+        }
+    }
+
+    private URL getUrl() throws MalformedURLException {
+        String configuredUrl = System.getProperty("appium.server.url");
+        if (configuredUrl == null || configuredUrl.isBlank()) {
+            configuredUrl = System.getenv("APPIUM_SERVER_URL");
+        }
+        String serverUrl = configuredUrl == null || configuredUrl.isBlank()
+                ? "http://127.0.0.1:4723"
+                : configuredUrl.trim();
+        URI uri = URI.create(serverUrl);
+        if (!"http".equalsIgnoreCase(uri.getScheme())
+                && !"https".equalsIgnoreCase(uri.getScheme())) {
+            throw new IllegalArgumentException("Appium server URL must use HTTP or HTTPS: " + serverUrl);
+        }
+        if (uri.getHost() == null) {
+            throw new IllegalArgumentException("Appium server URL must include a host: " + serverUrl);
+        }
+        return uri.toURL();
+    }
+
+    private boolean isConnectionRefused(Throwable exception) {
+        for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ConnectException) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getOTPFromDatabase(String mobileNumber)
+            throws SQLException {
+
+        String url = "jdbc:mysql://172.29.0.11:3306/communication";
+        String username = "";
+        String password = "";
+
+
+
+        String query =
+                "SELECT otp " +
+                        "FROM otp_info " +
+                        "WHERE mobile_number = ? " +
+                        "ORDER BY id DESC " +
+                        "LIMIT 1";
+
+
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+
+             PreparedStatement statement =
+                     connection.prepareStatement(query)) {
+
+            statement.setString(1, mobileNumber);
+
+            try (ResultSet result = statement.executeQuery()) {
+
+                if (result.next()) {
+
+                    String message = result.getString("otp");
+
+                    Pattern pattern = Pattern.compile(
+                            "(?:verification code is\\s*<b>|OTP is\\s*)(\\d{6})"
+                    );
+
+
+                    Matcher matcher = pattern.matcher(message);
+
+                    if (matcher.find()) {
+                        return matcher.group(1);
+                    }
+
+                    return result.getString("otp");
+                }
+            }
+        }
+        return null;
+    }
+}
