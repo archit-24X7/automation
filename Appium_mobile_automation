@@ -5,8 +5,8 @@
   "appium:deviceName": "emulator-5554",
   "appium:udid": "emulator-5554",
   "appium:automationName": "UiAutomator2",
-  "appium:appPackage": "com.myzamtel.staging",
-  "appium:appActivity": "com.myzamtel.staging.MainActivity"
+  "appium:appPackage": "x",
+  "appium:appActivity": "x.MainActivity"
   "appium:noReset": true,
   "appium:newCommandTimeout": 3600
 }
@@ -52,8 +52,8 @@ public class AppiumTest {
             .amend("appium:deviceName", "emulator-5554")
             .amend("appium:udid", "emulator-5554")
             .amend("appium:automationName", "UiAutomator2")
-            .amend("appium:appPackage", "com.myzamtel.staging")
-            .amend("appium:appActivity", "com.myzamtel.feature.MainActivity")
+            .amend("appium:appPackage", "com.myx.staging")
+            .amend("appium:appActivity", "com.myx.feature.MainActivity")
             .amend("appium:noReset", false)
             .amend("appium:newCommandTimeout", 3600)
             .amend("appium:ensureWebviewsHavePages", true)
